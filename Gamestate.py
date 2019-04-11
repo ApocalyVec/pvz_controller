@@ -45,6 +45,9 @@ class Gamestate:
     def add_sun(self, new_sun):
         self.sun = self.sun + new_sun
 
+    def remove_sun(self, spent_sun):
+        self.sun = self.sun - spent_sun
+
     def attack_power(self, row):
         atk = 0
         for col in range(len(self.field[0])):
