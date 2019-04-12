@@ -17,6 +17,10 @@ from Game import Game
 
 # API class that does the clicking
 
+# base threat levels of different zombies
+zombie_dic = dict()
+zombie_dic['normal'] = 200
+
 
 if __name__ == '__main__':
 
@@ -38,7 +42,20 @@ if __name__ == '__main__':
 
         game.click_sun()
 
-        # game.click_menu()
+        normal_z_coords = game.where_are_normal_zombies()
+        conehead_z_coords = game.where_are_conehead_zombies()
+
+        if normal_z_coords is not None:
+            for nzc in normal_z_coords:
+                print("Normal zombie found at: (" + str(nzc[0]) + ", " + str(nzc[1]) + ")")
+                # controller.move_mouse(nzc[0], nzc[1])
+
+        if conehead_z_coords is not None:
+            for czc in conehead_z_coords:
+                print("Conehead zombie found at: (" + str(czc[0]) + ", " + str(czc[1]) + ")")
+                # controller.move_mouse(czc[0], czc[1])
+
+        # print("zombie Coord Done")
 
         current_time = time.time()
         time_since_start = current_time - start_time
@@ -57,3 +74,4 @@ if __name__ == '__main__':
         # if time_since_start < 5.0:
         #     controller.move_mouse(30, 12)
         #     controller.left_mouse_click()
+

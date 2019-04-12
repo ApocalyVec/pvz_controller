@@ -19,13 +19,54 @@ class Game:
         matches = self.observer.find_template(template, threshold=threshold)
         return np.shape(matches)[1] >= 1
 
+    def where_are_objects(self, template, boundingbox = (790, 640, 10, 50), threshold = 0.9):
+        """
+
+        :param template:
+        :param threshold:
+        :return a list of xy pairs denoting the positions of the objects within the boundingbox,
+                returns None if the object is not found
+        """
+        matches = self.observer.find_template(template, threshold=threshold)
+        x_list = matches[0]
+        y_list = matches[1]
+
+        if x_list.size == 0 and y_list.size == 0:
+            return None
+        else:
+            if matches[1].size != matches[0].size:
+                raise Exception("x y array size DISMATCH!")
+
+            coord_list = []
+
+            if x_list.size == 1 and y_list.size == 1:
+                coord_list.append((x_list[0], y_list[0]))
+                return coord_list
+
+            for i in range(int(matches[0].size/2)-1):  # iterate through x list and y list
+                actual_i = 2 * i
+                coord_list.append((x_list[actual_i]/2, y_list[actual_i]/2))
+
+            return coord_list
+
+    def where_are_normal_zombies(self):
+        return self.where_are_objects('normal_z', threshold=0.8)
+
+    def where_are_conehead_zombies(self):
+        return self.where_are_objects('conehead_z', threshold=0.8)
+    #
+    # def where_are_Flag_zombies(self):
+    #
+    # def where_are_vaulting_zombies(self):
+
+
     def click_object(self, template, threshold = 0.9, boundingbox = (790, 640, 10, 50), offset=(0, 0)):
         matches = self.observer.find_template(template, threshold)
 
         if matches[0].size != 0 and matches[1].size != 0:  # if the object is found
             x = (matches[1][0] * self.observer.get_x_ratio()) + offset[0] # (1679 / 800)
             y = (matches[0][0] * self.observer.get_x_ratio()) + offset[1] # * (600 / 1049)
-            print("template: " + template + " found at " + str(x) + " " + str(y))
+            # print("template: " + template + " found at " + str(x) + " " + str(y))
 
             # TODO define game box
             if x > boundingbox[0] or y > boundingbox[1] or x < boundingbox[2] or y < boundingbox[3]:  # don't click outside out the window
@@ -33,8 +74,8 @@ class Game:
             else:
                 self.controller.move_mouse(x, y)
                 self.controller.left_mouse_click()
-        else:
-            print("template: " + template + " not found")
+        # else:
+            # print("template: " + template + " not found")
 
     # def click_menu(self):
     #     return self.click_object('menu', offset=(0, 0))
@@ -44,4 +85,9 @@ class Game:
         return self.click_object('sun_core', threshold = 0.97, boundingbox = (790, 640, 10, 130), offset=(0, 50))
 
 
+    def floor_1(self, num):
+        if num <= 0:
+            return 0;
+        else:
+            return num
 # TODO PROBLEMS

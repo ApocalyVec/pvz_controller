@@ -10,8 +10,6 @@ from PIL import Image
 import numpy as np
 import time
 
-from AppKit import NSScreen
-
 
 class Observer:
     def __init__(self, bbox=(50, 10, 800, 640), ssize=(1679, 1049)):
@@ -19,7 +17,11 @@ class Observer:
         self.image_assets = {
             'sun': 'assets/sun.png',
             'sun_core': 'assets/sun_core.png',
-            'menu': 'assets/menu.png'
+            'menu': 'assets/menu.png',
+
+            # zombies
+            'normal_z': 'assets/zombies/normal_z.png',
+            'conehead_z': 'assets/zombies/conehead_z.png'
         }
 
         # TODO
