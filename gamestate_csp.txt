@@ -1,0 +1,39 @@
+##### - variables
+A
+B
+C
+D
+E
+F
+G
+##### - values
+b 50
+c 100
+d 0
+##### - budget constraint
+50
+##### - threat level
+0
+##### - attack power
+0
+##### - unary inclusive
+C d
+D d
+E d
+F d
+G d
+##### - unary exclusive
+A c
+B c
+C b
+D b
+E b
+F b
+G b
+##### - binary equals
+##### - binary not equals
+##### - binary not simultaneous
+D C c d
+E D c d
+F E c d
+G F c d
