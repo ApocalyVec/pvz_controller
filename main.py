@@ -89,12 +89,13 @@ if __name__ == '__main__':
     observer = Observer(bbox=boundingBox, ssize=screenDimension)
     game = Game(controller, observer)  # API class that does the clicking
 
-    # TODO automatically resume game
+    state = Gamestate() # TODO
+
+
     time.sleep(2.0)
 
     start_time = time.time()
     while 1:
-        # TODO fix when it can not find the object
 
         game.refresh()
 
@@ -122,6 +123,17 @@ if __name__ == '__main__':
                 # controller.move_mouse(czc[0], czc[1])
 
         # print("zombie Coord Done")
+
+
+        sun = game.get_sun() # TODO
+        state
+
+
+
+
+
+
+
 
         current_time = time.time()
         time_since_start = current_time - start_time
