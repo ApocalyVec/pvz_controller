@@ -66,7 +66,7 @@ class Game:
         if matches[0].size != 0 and matches[1].size != 0:  # if the object is found
             x = (matches[1][0] * self.observer.get_x_ratio()) + offset[0] # (1679 / 800)
             y = (matches[0][0] * self.observer.get_x_ratio()) + offset[1] # * (600 / 1049)
-            # print("template: " + template + " found at " + str(x) + " " + str(y))
+            print("template: " + template + " found at " + str(x) + " " + str(y))
 
             # TODO define game box
             if x > boundingbox[0] or y > boundingbox[1] or x < boundingbox[2] or y < boundingbox[3]:  # don't click outside out the window
@@ -75,7 +75,7 @@ class Game:
                 self.controller.move_mouse(x, y)
                 self.controller.left_mouse_click()
         # else:
-            # print("template: " + template + " not found")
+            print("template: " + template + " not found")
 
     # def click_menu(self):
     #     return self.click_object('menu', offset=(0, 0))
