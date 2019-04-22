@@ -45,6 +45,12 @@ class Gamestate:
     def add_sun(self, new_sun):
         self.sun = self.sun + new_sun
 
+    def set_sun(self, new_sun):
+        self.sun = new_sun
+
+    def get_sun(self):
+        return self.sun
+
     def remove_sun(self, spent_sun):
         self.sun = self.sun - spent_sun
 

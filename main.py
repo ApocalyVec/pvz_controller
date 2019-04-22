@@ -5,15 +5,25 @@ import time
 from Controller import Controller
 from Observer import Observer
 from Game import Game
-
-
-# TODO being able to click on the suns
-# TODO being able to plant plants
-# TODO know zombies are coming
+import numpy
+import Solve_and_Update_Gamestate
+from Gamestate import Gamestate
 
 # TODO define game box: in Game and Observer
 
 # TODO define monitor in observer!!! to fix boundingbox
+
+lane_dic = dict()
+
+lane_dic[0] = (0, 60)
+lane_dic[1] = (115, 170)
+lane_dic[2] = (200, 280)
+lane_dic[3] = (300, 360)
+lane_dic[4] = (380, 500)
+
+normal_z_threat = 100
+conehead_z_threat = 200
+vaulting_z_threat = 250
 
 
 def compress_zombie_pos(coords):
@@ -56,25 +66,34 @@ def compress_zombie_pos(coords):
     return actual_coords
 
 
-def resolve_zom_pos(zom_pos):
+def resolve_zom_pos(zom_pos, hmax=800):
     """
 
+    :param hmax:
     :param zom_pos: the position of the zombies
-    :return: (lane, threat_num): int, int
+    :return: (lane, threat_num): int, float
     """
-    lane_dic = []
+    global lane_dic
 
-    lane_dic[0] = (0, 60)
-    lane_dic[1] = (115, 150)
-    lane_dic[2] = ()
-    lane_dic[3] = (320, 360)
-    lane_dic[4] = ()
+    x_pos = zom_pos[1]
+    y_pos = zom_pos[0]
 
-    x_pos = zom_pos[0]
-    y_pos = zom_pos[1]
+    threat_n = hmax / x_pos
 
-    # if <= x_pos
+    if lane_dic[0][0] <= y_pos <= lane_dic[0][1]:
+        lane_p = 0
+    elif lane_dic[1][0] <= y_pos <= lane_dic[1][1]:
+        lane_p = 1
+    elif lane_dic[2][0] <= y_pos <= lane_dic[2][1]:
+        lane_p = 2
+    elif lane_dic[3][0] <= y_pos <= lane_dic[3][1]:
+        lane_p = 3
+    elif lane_dic[4][0] <= y_pos <= lane_dic[4][1]:
+        lane_p = 4
+    else:
+        raise Exception("main.py: resolve_zom_pos: Failed, check global lane_dic, uncaught y is " + str(y_pos))
 
+    return lane_p, threat_n
 
 # base threat levels of different zombies
 zombie_dic = dict()
@@ -89,59 +108,107 @@ if __name__ == '__main__':
     observer = Observer(bbox=boundingBox, ssize=screenDimension)
     game = Game(controller, observer)  # API class that does the clicking
 
-    state = Gamestate() # TODO
+    ##################
+    # Init Game Solver
+    state = Gamestate()
+    state.set_field_size(5, 7)
 
+    plant_mat = numpy.zeros(shape=(3, 3), dtype=int)
+    plant_mat[0] = [1, 50, 0]  # sunflower
+    plant_mat[1] = [2, 100, 135]  # peashooter
+    plant_mat[2] = [3, 0, 0]  # empty slot
+    state.set_plants(plant_mat)
+    ##################
 
     time.sleep(2.0)
 
     start_time = time.time()
+
+    state.set_sun(50)
+
     while 1:
 
         game.refresh()
 
-        game.click_sun()
+        # TODO need to implement digit reg. to get current sun
+        if game.click_sun():
+            state.add_sun(25)
+        print("Current sun is " + str(state.get_sun()))
+        time.sleep(0.2)
+
+
+        """
+        Working on zombies
+        """
+        threat_dic = dict()
+        threat_dic[0] = 0
+        threat_dic[1] = 0
+        threat_dic[2] = 0
+        threat_dic[3] = 0
+        threat_dic[4] = 0
 
         normal_z_coords = game.where_are_normal_zombies()
         conehead_z_coords = game.where_are_conehead_zombies()
-
+        vaulting_z_coords = game.where_are_vaulting_zombies()
 
         if normal_z_coords is not None:
 
             actual_nzc = compress_zombie_pos(normal_z_coords)
 
             for nzc in actual_nzc:
-                print("Normal zombie found at: (" + str(nzc[0]) + ", " + str(nzc[1]) + ")")
-                # controller.move_mouse(nzc[0], nzc[1])
+                # print("Normal zombie found at: (" + str(nzc[0]) + ", " + str(nzc[1]) + ")")
 
+                lane_present, threat_num = resolve_zom_pos(nzc)
+                threat_dic[lane_present] = int(threat_dic[lane_present] + threat_num * normal_z_threat)
+                print("Normal zombie at lane " + str(lane_present) + ", threat num is " + str(threat_num))
 
         if conehead_z_coords is not None:
 
             actual_czc = compress_zombie_pos(conehead_z_coords)
 
             for czc in actual_czc:
-                print("Conehead zombie found at: (" + str(czc[0]) + ", " + str(czc[1]) + ")")
+                # print("Conehead zombie found at: (" + str(czc[0]) + ", " + str(czc[1]) + ")")
                 # controller.move_mouse(czc[0], czc[1])
 
+                lane_present, threat_num = resolve_zom_pos(czc)
+                threat_dic[lane_present] = int(threat_dic[lane_present] + threat_num * conehead_z_threat)
+                print("Conehead zombie at lane " + str(lane_present) + ", threat num is " + str(threat_num))
+
+        if vaulting_z_coords is not None:
+
+            actual_vzc = compress_zombie_pos(vaulting_z_coords)
+
+            for vzc in actual_vzc:
+                # print("Vaulting zombie found at: (" + str(vzc[0]) + ", " + str(vzc[1]) + ")")
+
+                lane_present, threat_num = resolve_zom_pos(vzc)
+                threat_dic[lane_present] = int(threat_dic[lane_present] + threat_num * vaulting_z_threat)
+                print("Vaulting zombie at lane " + str(lane_present) + ", threat num is " + str(threat_num))
+
+        print("Threats:")
+        for key, value in threat_dic.items():
+            print("lane[" + str(key) + "]: " + str(value))
+
         # print("zombie Coord Done")
+        #
+        # sun = game.get_sun() # TODO
 
+        state.set_threats(threat_dic)
+        #
+        sug = Solve_and_Update_Gamestate
+        solution_dict = sug.solve_and_update_gamestate(state)
 
-        sun = game.get_sun() # TODO
-        state
+        print(solution_dict)
 
-
-
-
-
-
-
+        for coords, plant_num in solution_dict.items():
+            state.remove_sun(game.plant_plant(coords, plant_num))
 
         current_time = time.time()
         time_since_start = current_time - start_time
         print("one frame done, time since start = " + str(time_since_start))
-        time.sleep(0.2)
 
         print()
-        if time_since_start > 50.0:
+        if time_since_start > 25.0:
             break
 
         # current_time = time.time()

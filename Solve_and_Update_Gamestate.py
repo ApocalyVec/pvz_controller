@@ -30,16 +30,16 @@ def solve_and_update_gamestate(gamestate):  # take in gamestate
     else:
         field_row = val
         csp = parse_csp("gamestate_csp.txt")
-        print("field row: " + str(field_row))
-        print("sun budget: " + str(csp.budget))
-        print(csp)
+        # print("field row: " + str(field_row))
+        # print("sun budget: " + str(csp.budget))
+        # print(csp)
         ans = run_csp(csp)
         if ans is False:
             raise Exception("CSP unsolvable, killed")
         else:
             (assignment, csp) = ans
             scrubbed_assignments = remove_redundant_assignments(assignment, gamestate, field_row)
-            print(scrubbed_assignments)
+            # print(scrubbed_assignments)
             return scrubbed_assignments
 
 
@@ -190,19 +190,19 @@ def parse_csp(filePath):
 def run_csp(csp):
     if not ac_3(csp):
         print("CSP is AC3 INCONSISTENT, killed")
-    print("Variables and their domain after applying Arc Consistency: ")
-    csp.print_all_variable()
+    # print("Variables and their domain after applying Arc Consistency: ")
+    # csp.print_all_variable()
 
     assignment = {}  # represent the assignment of variables [Key: Variable, Value: value (str)]
 
     initialize_assignment(assignment, csp)
 
     if backtrack(assignment, csp, False) is not None:
-        print()
-        print("CSP Answer is: ")
-        for var, value in assignment.items():
-            print(var.name + ": " + value)
-        print(str(csp.runtime.get_spending(assignment, csp.value_costs)))
+        # print()
+        # print("CSP Answer is: ")
+        # for var, value in assignment.items():
+        #     print(var.name + ": " + value)
+        # print(str(csp.runtime.get_spending(assignment, csp.value_costs)))
         return (assignment, csp)
     else:
         print("CSP is UNSOLVABLE, killed")

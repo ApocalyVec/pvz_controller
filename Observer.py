@@ -6,9 +6,10 @@ Date: 04/08/2019
 import cv2
 import os
 from mss import mss
-from PIL import Image
 import numpy as np
 import time
+from PIL import Image
+import pytesseract as tes
 
 
 class Observer:
@@ -21,7 +22,12 @@ class Observer:
 
             # zombies
             'normal_z': 'assets/zombies/normal_z.png',
-            'conehead_z': 'assets/zombies/conehead_z.png'
+            'conehead_z': 'assets/zombies/conehead_z.png',
+            'vaulting_z': 'assets/zombies/vaulting_z.png',
+
+            # plant cards
+            'peashooter_card': 'assets/cards/peashooter_card.png',
+            'sunflower_card': 'assets/cards/sunflower_card.png'
         }
 
         # TODO
@@ -64,6 +70,7 @@ class Observer:
         img = self.convert_rgb_to_bgr(img)
         img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
+        # save each processed image
         # img_gray_png = Image.fromarray(img_gray)
         # img_gray_png.save(os.getcwd() + '\\full_snap__' + str(int(time.time())) + '.png', 'PNG')
 
@@ -94,3 +101,4 @@ class Observer:
         #     image = self.frame
 
         return self.match_template(self.image_template[name], threshold)
+

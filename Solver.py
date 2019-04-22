@@ -115,13 +115,13 @@ def backtrack(assignment, csp, is_rtcost):
     """
     if is_assignment_complete(assignment): return assignment
     var = select_unassigned_var(assignment, csp)
-    print()
-    print("Considering: " + var.name + ", Trying: ")
+    # print()
+    # print("Considering: " + var.name + ", Trying: ")
     for value in ordered_domain_threat_level(var, assignment, csp):
-        print("[value " + value + "]")
+        # print("[value " + value + "]")
         if check_value_consistency(var, value, assignment, csp):
             assignment[var] = value
-            print("Assignment is " + str([(key.name + "-" + str(value)) for key, value in assignment.items()]))
+            # print("Assignment is " + str([(key.name + "-" + str(value)) for key, value in assignment.items()]))
             if not check_budget(assignment, csp):
                 print("Assignment violated budget constraint")
                 assignment[var] = None
@@ -129,11 +129,11 @@ def backtrack(assignment, csp, is_rtcost):
                 return None
 
             if inference(var, value, csp):  # if inference left any variable's domain to be empty
-                print("Assignment after inference is " + str([(key.name + "-" + str(value)) for key, value in assignment.items()]))
+                # print("Assignment after inference is " + str([(key.name + "-" + str(value)) for key, value in assignment.items()]))
                 result = backtrack(assignment, csp, is_rtcost)  # recursion call
                 if result is not None:
                     return result
-            print("Backtracking, removing " + var.name)
+            # print("Backtracking, removing " + var.name)
             assignment[var] = None  # remove this assignment
 
     return None
