@@ -1,5 +1,18 @@
-Dependences:
+This program is implemented in python 3.7.
 
-PIL
-numpy
-opencv
+Current implementation is for demo purposes and has only been tested on MacBook Pro with display scale of 2880 * 1800
+
+Steps
+
+1. Install and run plant vs. zombie 1 (game of the year edition) from Origin
+2. Set the screen's aspect to 1980 * 1080
+3. Anchor the game window at the top left corner of the display
+4. Start a new game, the current implementation only counts for levels before level 1-6
+5. After 'ready, set, plant' passes, run the program, the current implementation terminates after running for 50 seconds.
+
+Dependences:
+    PIL
+    numpy
+    pyscreenshot
+    opencv
+    mss

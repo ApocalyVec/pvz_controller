@@ -1,3 +1,5 @@
+import threading
+
 import pyscreenshot as ImageGrab
 import os
 import time
@@ -9,9 +11,7 @@ import numpy
 import Solve_and_Update_Gamestate
 from Gamestate import Gamestate
 
-# TODO define game box: in Game and Observer
-
-# TODO define monitor in observer!!! to fix boundingbox
+# TODO WE REALLY NEED TO RECOGNIZE SUN COUNT THROUGH CV
 
 lane_dic = dict()
 
@@ -24,6 +24,22 @@ lane_dic[4] = (380, 500)
 normal_z_threat = 100
 conehead_z_threat = 200
 vaulting_z_threat = 250
+
+is_sunflower_ready = True
+is_peashooter_ready = True
+
+sunflower_cd = 5 + 3  # allow 1 sec of wiggle room
+peashooter_cd = 5 + 3  # allow 1 sec of wiggle room
+
+
+def sunflower_cd_ISR():
+    global is_sunflower_ready
+    is_sunflower_ready = True
+
+
+def peashooter_cd_ISR():
+    global is_peashooter_ready
+    is_peashooter_ready = True
 
 
 def compress_zombie_pos(coords):
@@ -91,9 +107,12 @@ def resolve_zom_pos(zom_pos, hmax=800):
     elif lane_dic[4][0] <= y_pos <= lane_dic[4][1]:
         lane_p = 4
     else:
-        raise Exception("main.py: resolve_zom_pos: Failed, check global lane_dic, uncaught y is " + str(y_pos))
+        lane_p = None
+        print("main.py: resolve_zom_pos: Failed, check global lane_dic, uncaught y is " + str(y_pos))
+        # raise Exception("main.py: resolve_zom_pos: Failed, check global lane_dic, uncaught y is " + str(y_pos))
 
     return lane_p, threat_n
+
 
 # base threat levels of different zombies
 zombie_dic = dict()
@@ -115,7 +134,7 @@ if __name__ == '__main__':
 
     plant_mat = numpy.zeros(shape=(3, 3), dtype=int)
     plant_mat[0] = [1, 50, 0]  # sunflower
-    plant_mat[1] = [2, 100, 135]  # peashooter
+    plant_mat[1] = [2, 100, 110]  # peashooter
     plant_mat[2] = [3, 0, 0]  # empty slot
     state.set_plants(plant_mat)
     ##################
@@ -123,8 +142,10 @@ if __name__ == '__main__':
     time.sleep(2.0)
 
     start_time = time.time()
-
     state.set_sun(50)
+
+    # peashooter_timer = threading.Timer(peashooter_cd, is_peashooter_ready)
+    # peashooter_timer.start()
 
     while 1:
 
@@ -135,7 +156,6 @@ if __name__ == '__main__':
             state.add_sun(25)
         print("Current sun is " + str(state.get_sun()))
         time.sleep(0.2)
-
 
         """
         Working on zombies
@@ -159,8 +179,9 @@ if __name__ == '__main__':
                 # print("Normal zombie found at: (" + str(nzc[0]) + ", " + str(nzc[1]) + ")")
 
                 lane_present, threat_num = resolve_zom_pos(nzc)
-                threat_dic[lane_present] = int(threat_dic[lane_present] + threat_num * normal_z_threat)
-                print("Normal zombie at lane " + str(lane_present) + ", threat num is " + str(threat_num))
+                if lane_present:
+                    threat_dic[lane_present] = int(threat_dic[lane_present] + threat_num * normal_z_threat)
+                    print("Normal zombie at lane " + str(lane_present) + ", threat num is " + str(threat_num))
 
         if conehead_z_coords is not None:
 
@@ -171,8 +192,9 @@ if __name__ == '__main__':
                 # controller.move_mouse(czc[0], czc[1])
 
                 lane_present, threat_num = resolve_zom_pos(czc)
-                threat_dic[lane_present] = int(threat_dic[lane_present] + threat_num * conehead_z_threat)
-                print("Conehead zombie at lane " + str(lane_present) + ", threat num is " + str(threat_num))
+                if lane_present:
+                    threat_dic[lane_present] = int(threat_dic[lane_present] + threat_num * conehead_z_threat)
+                    print("Conehead zombie at lane " + str(lane_present) + ", threat num is " + str(threat_num))
 
         if vaulting_z_coords is not None:
 
@@ -182,8 +204,9 @@ if __name__ == '__main__':
                 # print("Vaulting zombie found at: (" + str(vzc[0]) + ", " + str(vzc[1]) + ")")
 
                 lane_present, threat_num = resolve_zom_pos(vzc)
-                threat_dic[lane_present] = int(threat_dic[lane_present] + threat_num * vaulting_z_threat)
-                print("Vaulting zombie at lane " + str(lane_present) + ", threat num is " + str(threat_num))
+                if lane_present:
+                    threat_dic[lane_present] = int(threat_dic[lane_present] + threat_num * vaulting_z_threat)
+                    print("Vaulting zombie at lane " + str(lane_present) + ", threat num is " + str(threat_num))
 
         print("Threats:")
         for key, value in threat_dic.items():
@@ -200,15 +223,41 @@ if __name__ == '__main__':
 
         print(solution_dict)
 
+        # reverse item order in solution dict
+        solution_list = []
+
         for coords, plant_num in solution_dict.items():
-            state.remove_sun(game.plant_plant(coords, plant_num))
+            solution_list.append((coords, plant_num))
+
+        solution_list.reverse()
+
+        for coords, plant_num in solution_list:
+            if plant_num == 1:
+                if is_sunflower_ready:
+                    state.remove_sun(game.plant_plant(coords, plant_num))
+                    state.add_plant(coords[0], coords[1], plant_num)
+                    is_sunflower_ready = False
+                    # start timer thread
+                    sunflower_timer = threading.Timer(sunflower_cd, sunflower_cd_ISR)
+                    sunflower_timer.start()
+
+            if plant_num == 2:
+                if is_peashooter_ready:
+                    state.remove_sun(game.plant_plant(coords, plant_num))
+                    state.add_plant(coords[0], coords[1], plant_num)
+                    is_peashooter_ready = False
+                    # start timer thread
+                    peashooter_timer = threading.Timer(peashooter_cd, peashooter_cd_ISR)
+                    peashooter_timer.start()
+
 
         current_time = time.time()
         time_since_start = current_time - start_time
+        print
         print("one frame done, time since start = " + str(time_since_start))
 
         print()
-        if time_since_start > 25.0:
+        if time_since_start > 120.0:
             break
 
         # current_time = time.time()

@@ -18,16 +18,17 @@ class Game:
 
     def click_target_box(self, x, y):
 
-        x_offset = 80
-        y_offset = 180
+        x_slope = 80
+        y_slope = 100
 
-        x_slope = 50
-        y_slope = 50
+        x_offset = 35 + x_slope / 2
+        y_offset = 180
 
         x_coord = x_offset + x * x_slope
         y_coord = y_offset + y * y_slope
 
         self.controller.move_mouse(x_coord, y_coord)
+        time.sleep(0.3)
         self.controller.left_mouse_click()
 
     def refresh(self):
@@ -81,6 +82,14 @@ class Game:
         return self.where_are_objects('vaulting_z', threshold=0.8)
 
     def click_object(self, template, threshold=0.9, boundingbox=(790, 640, 10, 50), offset=(0, 0)):
+        """
+
+        :param template:
+        :param threshold:
+        :param boundingbox:
+        :param offset:
+        :return: True if the object is found and clicked, None otherwise
+        """
         matches = self.observer.find_template(template, threshold)
 
         if matches[0].size != 0 and matches[1].size != 0:  # if the object is found
@@ -93,7 +102,12 @@ class Game:
                 3]:  # don't click outside out the window
                 print("invalid x y, outside clicking box")
             else:
+                time.sleep(0.2)
                 self.controller.move_mouse(x, y)
+                self.controller.left_mouse_click()
+                self.controller.move_mouse(x + 5, y + 5)
+                self.controller.left_mouse_click()
+                self.controller.move_mouse(x + 10, y + 10)
                 self.controller.left_mouse_click()
 
                 # something has been clicked
@@ -125,13 +139,15 @@ class Game:
         self.controller.left_mouse_click()
         time.sleep(0.2)
 
-        self.click_target_box(coords[0], coords[1])
+        self.click_target_box(coords[1], coords[0])  # y comes first in the tuple
 
         return cost
 
     def click_sun(self):
         # TODO this boundingbox only works when the 800*600 game window is at the top-left coirer of the screen
-        if self.click_object('sun_core', threshold=0.97, boundingbox=(790, 640, 10, 130), offset=(5, 55)):
+        if self.click_object('sun_core', threshold=0.98, boundingbox=(790, 640, 10, 130), offset=(10, 60)):
+            # self.click_object('sun_core', threshold=0.98, boundingbox=(790, 640, 10, 130), offset=(15, 70))
+            # self.click_object('sun_core', threshold=0.98, boundingbox=(790, 640, 10, 130), offset=(20, 80))
             return True
 
     def floor_1(self, num):

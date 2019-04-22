@@ -9,7 +9,6 @@ from mss import mss
 import numpy as np
 import time
 from PIL import Image
-import pytesseract as tes
 
 
 class Observer:
