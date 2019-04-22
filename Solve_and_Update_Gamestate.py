@@ -26,11 +26,11 @@ def solve_and_update_gamestate(gamestate):  # take in gamestate
 
     val = update_csp_file(gamestate)
     if val is False:
-        return False  # No action necessary
+        return dict()  # No action necessary
     else:
         field_row = val
         csp = parse_csp("gamestate_csp.txt")
-        # print("field row: " + str(field_row))
+        print("field row: " + str(field_row))
         # print("sun budget: " + str(csp.budget))
         # print(csp)
         ans = run_csp(csp)
@@ -39,7 +39,7 @@ def solve_and_update_gamestate(gamestate):  # take in gamestate
         else:
             (assignment, csp) = ans
             scrubbed_assignments = remove_redundant_assignments(assignment, gamestate, field_row)
-            # print(scrubbed_assignments)
+            print(scrubbed_assignments)
             return scrubbed_assignments
 
 

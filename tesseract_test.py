@@ -3,7 +3,8 @@ try:
 except ImportError:
     import Image
 import pytesseract
+# import
 
 
-results = pytesseract.image_to_string(Image.open('assets/sun_test.png'))
+results = pytesseract.image_to_string(Image.open('ss/ss1.png'))
 print(results)

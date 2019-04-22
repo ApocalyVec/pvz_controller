@@ -11,14 +11,15 @@ b 50
 c 100
 d 0
 ##### - budget constraint
-250
+175
 ##### - threat level
 0
 ##### - attack power
-110
+120
 ##### - unary inclusive
-C d
-D c
+A b
+C c
+D d
 E d
 F d
 G d

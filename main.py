@@ -15,7 +15,7 @@ from Gamestate import Gamestate
 
 lane_dic = dict()
 
-lane_dic[0] = (0, 60)
+lane_dic[0] = (0, 90)
 lane_dic[1] = (115, 170)
 lane_dic[2] = (200, 280)
 lane_dic[3] = (300, 360)
@@ -134,7 +134,7 @@ if __name__ == '__main__':
 
     plant_mat = numpy.zeros(shape=(3, 3), dtype=int)
     plant_mat[0] = [1, 50, 0]  # sunflower
-    plant_mat[1] = [2, 100, 110]  # peashooter
+    plant_mat[1] = [2, 100, 120]  # peashooter
     plant_mat[2] = [3, 0, 0]  # empty slot
     state.set_plants(plant_mat)
     ##################
@@ -221,15 +221,14 @@ if __name__ == '__main__':
         sug = Solve_and_Update_Gamestate
         solution_dict = sug.solve_and_update_gamestate(state)
 
-        print(solution_dict)
-
         # reverse item order in solution dict
         solution_list = []
 
         for coords, plant_num in solution_dict.items():
             solution_list.append((coords, plant_num))
 
-        solution_list.reverse()
+        solution_list.sort(key=lambda x: x[0][1])  # plant the leftmost plant first
+        print(solution_list)
 
         for coords, plant_num in solution_list:
             if plant_num == 1:
@@ -250,14 +249,13 @@ if __name__ == '__main__':
                     peashooter_timer = threading.Timer(peashooter_cd, peashooter_cd_ISR)
                     peashooter_timer.start()
 
-
         current_time = time.time()
         time_since_start = current_time - start_time
         print
         print("one frame done, time since start = " + str(time_since_start))
 
         print()
-        if time_since_start > 120.0:
+        if time_since_start > 180.0:
             break
 
         # current_time = time.time()
