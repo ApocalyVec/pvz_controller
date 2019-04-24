@@ -28,8 +28,13 @@ class Game:
         y_coord = y_offset + y * y_slope
 
         self.controller.move_mouse(x_coord, y_coord)
-        time.sleep(0.3)
+        time.sleep(0.1)
         self.controller.left_mouse_click()
+        time.sleep(0.1)
+        self.controller.left_mouse_click()
+        time.sleep(0.1)
+        self.controller.left_mouse_click()
+
 
     def refresh(self):
         self.observer.refresh_frame()
@@ -102,12 +107,14 @@ class Game:
                 3]:  # don't click outside out the window
                 print("invalid x y, outside clicking box")
             else:
-                time.sleep(0.2)
+                time.sleep(0.1)
                 self.controller.move_mouse(x, y)
                 self.controller.left_mouse_click()
-                self.controller.move_mouse(x + 5, y + 5)
-                self.controller.left_mouse_click()
+                time.sleep(0.1)
                 self.controller.move_mouse(x + 10, y + 10)
+                self.controller.left_mouse_click()
+                time.sleep(0.1)
+                self.controller.move_mouse(x + 30, y + 30)
                 self.controller.left_mouse_click()
 
                 # something has been clicked

@@ -155,6 +155,9 @@ if __name__ == '__main__':
         if game.click_sun():
             state.add_sun(25)
         print("Current sun is " + str(state.get_sun()))
+        print("Current sun is " + str(state.get_sun()))
+        print("Current sun is " + str(state.get_sun()))
+
         time.sleep(0.2)
 
         """
@@ -251,7 +254,6 @@ if __name__ == '__main__':
 
         current_time = time.time()
         time_since_start = current_time - start_time
-        print
         print("one frame done, time since start = " + str(time_since_start))
 
         print()

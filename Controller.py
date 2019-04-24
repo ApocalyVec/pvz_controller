@@ -7,7 +7,7 @@ import time
 import pyscreenshot as ImageGrab
 import os
 import time
-from pynput.mouse import Button, Controller as MouseController
+from pynput .mouse import Button, Controller as MouseController
 
 
 class Controller:

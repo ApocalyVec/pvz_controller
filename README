@@ -9,6 +9,7 @@ Steps
 3. Anchor the game window at the top left corner of the display
 4. Start a new game, the current implementation only counts for levels before level 1-6
 5. After 'ready, set, plant' passes, run the program, the current implementation terminates after running for 50 seconds.
+6. The program sleeps for 2 sec before going into problem solving loop, giving a window for the user to resume the game.
 
 Dependences:
     PIL
